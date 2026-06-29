@@ -31,6 +31,22 @@ Route::middleware('auth')->group(function () {
         return view('dashboard');
     })->name('dashboard');
 
+    Route::get('/device-types', function () {
+        return view('master-data.device-types.index');
+    })->name('device-types');
+
+    Route::get('/services', function () {
+        return view('master-data.services.index');
+    })->name('services');
+
+    Route::get('/invoices', function () {
+        return view('transactions.invoices.index');
+    })->name('invoices');
+
+    Route::get('/warranty-checks', function () {
+        return view('transactions.warranty-check.index');
+    })->name('warranty-checks');
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

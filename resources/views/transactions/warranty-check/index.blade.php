@@ -1,5 +1,5 @@
 @extends('layouts.app')
 
 @section('content')
-    <h1>Dashboard</h1>
+    <h1>Warranty Checks</h1>
 @endsection
