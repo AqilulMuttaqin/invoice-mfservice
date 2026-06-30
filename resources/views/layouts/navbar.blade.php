@@ -25,7 +25,7 @@
                                 ?
                             </span>
                             <div class="ms-3">
-                                <p class="mb-1 fw-bold">{{ Auth::user()->name }}</p>
+                                <p class="mb-1 fw-bold text-nowrap">{{ Auth::user()->name }}</p>
                                 <p class="mb-0 text-muted small">{{ Auth::user()->email }}</p>
                             </div>
                         </div>
