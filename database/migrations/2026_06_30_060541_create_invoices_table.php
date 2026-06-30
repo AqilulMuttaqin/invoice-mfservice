@@ -26,7 +26,7 @@ return new class extends Migration
             $table->text('physical_condition')->nullable();
             $table->text('technician_notes')->nullable();
             $table->date('received_date');
-            $table->date('estimated_finish_day')->nullable();
+            $table->decimal('estimated_finish_day', 30, 0)->nullable();
             $table->date('completed_date')->nullable();
             $table->date('picked_up_date')->nullable();
             $table->enum('status', [

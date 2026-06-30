@@ -31,7 +31,7 @@ class Invoice extends Model
 
     protected $casts = [
         'received_date' => 'date',
-        'estimated_finish_day' => 'date',
+        'estimated_finish_day' => 'decimal:30,0',
         'completed_date' => 'date',
         'picked_up_date' => 'date',
         'remaining_warranty_claim' => 'decimal:10,0',
