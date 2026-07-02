@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DeviceTypeController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -31,9 +32,13 @@ Route::middleware('auth')->group(function () {
         return view('dashboard');
     })->name('dashboard');
 
-    Route::get('/device-types', function () {
-        return view('master-data.device-types.index');
-    })->name('device-types');
+    Route::controller(DeviceTypeController::class)->prefix('device-types')->name('device-types.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::post('/', 'store')->name('store');
+        Route::get('/{deviceType}/edit', 'edit')->name('edit');
+        Route::put('/{deviceType}', 'update')->name('update');
+        Route::delete('/{deviceType}', 'destroy')->name('destroy');
+    });
 
     Route::get('/services', function () {
         return view('master-data.services.index');
@@ -52,4 +57,4 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

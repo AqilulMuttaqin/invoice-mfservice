@@ -14,8 +14,8 @@
             </li>
 
             <li class="sidebar-header">Master Data</li>
-            <li class="sidebar-item {{ request()->routeIs('device-types') ? 'active' : '' }}">
-                <a class="sidebar-link" href="{{ route('device-types') }}">
+            <li class="sidebar-item {{ request()->routeIs('device-types.index') ? 'active' : '' }}">
+                <a class="sidebar-link" href="{{ route('device-types.index') }}">
                     <i data-feather="cpu"></i>
                     <span>Device Types</span>
                 </a>
