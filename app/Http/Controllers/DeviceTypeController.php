@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\DeviceType;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Yajra\DataTables\DataTables;
 
 class DeviceTypeController extends Controller
@@ -12,7 +13,7 @@ class DeviceTypeController extends Controller
     public function index()
     {
         if (request()->ajax()) {
-            $deviceTypes = DeviceType::all();
+            $deviceTypes = DeviceType::orderBy('name');
 
             return DataTables::of($deviceTypes)
                 ->addIndexColumn()
@@ -31,7 +32,12 @@ class DeviceTypeController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255|unique:device_types,name',
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('device_types')->whereNull('deleted_at'),
+            ],
         ], [
             'name.required' => 'Device type name is required.',
             'name.unique' => 'Device type name already exists.',
@@ -60,7 +66,14 @@ class DeviceTypeController extends Controller
     public function update(Request $request, DeviceType $deviceType)
     {
         $request->validate([
-            'name' => 'required|string|max:255|unique:device_types,name,' . $deviceType->id,
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('device_types')
+                    ->whereNull('deleted_at')
+                    ->ignore($deviceType->id),
+            ],
         ], [
             'name.required' => 'Device type name is required.',
             'name.unique' => 'Device type name already exists.',
@@ -81,6 +94,12 @@ class DeviceTypeController extends Controller
 
     public function destroy(DeviceType $deviceType)
     {
+        if ($deviceType->services()->exists()) {
+            return response()->json([
+                'message' => 'This device type cannot be deleted because it is still used by one or more services.'
+            ], 422);
+        }
+
         try {
             $deviceType->delete();
 

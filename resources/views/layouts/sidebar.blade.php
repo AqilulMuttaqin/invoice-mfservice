@@ -20,8 +20,8 @@
                     <span>Device Types</span>
                 </a>
             </li>
-            <li class="sidebar-item {{ request()->routeIs('services') ? 'active' : '' }}">
-                <a class="sidebar-link" href="{{ route('services') }}">
+            <li class="sidebar-item {{ request()->routeIs('services.index') ? 'active' : '' }}">
+                <a class="sidebar-link" href="{{ route('services.index') }}">
                     <i data-feather="briefcase"></i>
                     <span>Services</span>
                 </a>

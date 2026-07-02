@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DeviceTypeController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ServiceController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -40,9 +41,13 @@ Route::middleware('auth')->group(function () {
         Route::delete('/{deviceType}', 'destroy')->name('destroy');
     });
 
-    Route::get('/services', function () {
-        return view('master-data.services.index');
-    })->name('services');
+    Route::controller(ServiceController::class)->prefix('services')->name('services.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::post('/', 'store')->name('store');
+        Route::get('/{service}/edit', 'edit')->name('edit');
+        Route::put('/{service}', 'update')->name('update');
+        Route::delete('/{service}', 'destroy')->name('destroy');
+    });
 
     Route::get('/invoices', function () {
         return view('transactions.invoices.index');
