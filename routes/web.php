@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DeviceTypeController;
+use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ServiceController;
 use Illuminate\Support\Facades\Auth;
@@ -49,9 +50,19 @@ Route::middleware('auth')->group(function () {
         Route::delete('/{service}', 'destroy')->name('destroy');
     });
 
-    Route::get('/invoices', function () {
-        return view('transactions.invoices.index');
-    })->name('invoices');
+    Route::controller(InvoiceController::class)->prefix('invoices')->name('invoices.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::post('/', 'store')->name('store');
+        Route::get('/{invoice}', 'show')->name('show');
+        Route::post('/{invoice}/items', 'addItem')->name('items.store');
+        Route::delete('/{invoice}/items/{item}', 'removeItem')->name('items.destroy');
+        Route::patch('/{invoice}/technician-notes', 'updateTechnicianNotes')->name('technician-notes');
+        Route::patch('/{invoice}/status', 'updateStatus')->name('update-status');
+        Route::get('/{invoice}/print-receipt', 'printReceipt')->name('print-receipt');
+        Route::get('/{invoice}/print-invoice', 'printInvoice')->name('print-invoice');
+    });
+
+    Route::get('/device-types/{deviceType}/services', [ServiceController::class, 'byDeviceType'])->name('device-types.services');
 
     Route::get('/warranty-checks', function () {
         return view('transactions.warranty-check.index');

@@ -138,4 +138,13 @@ class ServiceController extends Controller
             ], 500);
         }
     }
+
+    public function byDeviceType(DeviceType $deviceType)
+    {
+        $services = $deviceType->services()
+            ->orderBy('name')
+            ->get(['id', 'name', 'price']);
+
+        return response()->json($services);
+    }
 }

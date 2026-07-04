@@ -10,6 +10,7 @@ class Invoice extends Model
     use SoftDeletes;
 
     protected $fillable = [
+        'service_code',
         'invoice_code',
         'device_type_id',
         'device_name',
@@ -31,12 +32,12 @@ class Invoice extends Model
 
     protected $casts = [
         'received_date' => 'date',
-        'estimated_finish_day' => 'decimal:30,0',
+        'estimated_finish_day' => 'decimal:0',
         'completed_date' => 'date',
         'picked_up_date' => 'date',
-        'remaining_warranty_claim' => 'decimal:10,0',
-        'warranty_days' => 'decimal:10,0',
-        'grand_total' => 'decimal:12,2',
+        'remaining_warranty_claim' => 'decimal:0',
+        'warranty_days' => 'decimal:0',
+        'grand_total' => 'decimal:2',
     ];
 
     public function deviceType()

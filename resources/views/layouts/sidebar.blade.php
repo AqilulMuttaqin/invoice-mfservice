@@ -28,8 +28,8 @@
             </li>
 
             <li class="sidebar-header">Transactions</li>
-            <li class="sidebar-item {{ request()->routeIs('invoices') ? 'active' : '' }}">
-                <a class="sidebar-link" href="{{ route('invoices') }}">
+            <li class="sidebar-item {{ request()->routeIs('invoices.index') ? 'active' : '' }}">
+                <a class="sidebar-link" href="{{ route('invoices.index') }}">
                     <i data-feather="file-text"></i>
                     <span>Invoices</span>
                 </a>
