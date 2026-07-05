@@ -4,6 +4,7 @@ use App\Http\Controllers\DeviceTypeController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\WarrantyCheckController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -64,9 +65,9 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/device-types/{deviceType}/services', [ServiceController::class, 'byDeviceType'])->name('device-types.services');
 
-    Route::get('/warranty-checks', function () {
-        return view('transactions.warranty-check.index');
-    })->name('warranty-checks');
+    Route::get('/warranty-checks', [WarrantyCheckController::class, 'index'])->name('warranty-checks.index');
+    Route::post('/warranty-checks/search', [WarrantyCheckController::class, 'search'])->name('warranty-checks.search');
+    Route::post('/invoices/{invoice}/warranty-claim', [WarrantyCheckController::class, 'claim'])->name('warranty-checks.claim');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

@@ -34,8 +34,8 @@
                     <span>Invoices</span>
                 </a>
             </li>
-            <li class="sidebar-item {{ request()->routeIs('warranty-checks') ? 'active' : '' }}">
-                <a class="sidebar-link" href="{{ route('warranty-checks') }}">
+            <li class="sidebar-item {{ request()->routeIs('warranty-checks.index') ? 'active' : '' }}">
+                <a class="sidebar-link" href="{{ route('warranty-checks.index') }}">
                     <i data-feather="shield"></i>
                     <span>Warranty Checks</span>
                 </a>

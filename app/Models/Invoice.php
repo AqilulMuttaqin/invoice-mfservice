@@ -49,4 +49,9 @@ class Invoice extends Model
     {
         return $this->hasMany(InvoiceItem::class);
     }
+
+    public function warrantyClaims()
+    {
+        return $this->hasMany(WarrantyClaim::class)->orderByDesc('claimed_at');
+    }
 }
