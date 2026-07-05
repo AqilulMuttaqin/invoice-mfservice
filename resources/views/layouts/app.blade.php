@@ -15,7 +15,7 @@
 
     <link rel="shortcut icon" href="{{ asset('assets/src/img/icons/icon-48x48.png') }}" />
 
-    <title>MF Service | </title>
+    <title>MF Service | {{ $title }}</title>
 
     <link href="{{ asset('assets/src/css/bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ asset('assets/src/css/app.css') }}" rel="stylesheet">
