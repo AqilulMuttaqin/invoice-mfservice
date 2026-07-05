@@ -42,7 +42,7 @@ class Invoice extends Model
 
     public function deviceType()
     {
-        return $this->belongsTo(DeviceType::class);
+        return $this->belongsTo(DeviceType::class)->withTrashed();
     }
 
     public function items()

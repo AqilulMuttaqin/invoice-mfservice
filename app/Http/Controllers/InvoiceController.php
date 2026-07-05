@@ -6,6 +6,11 @@ use App\Models\DeviceType;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
 use App\Models\Service;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Endroid\QrCode\Builder\Builder;
+use Endroid\QrCode\Encoding\Encoding;
+use Endroid\QrCode\ErrorCorrectionLevel;
+use Endroid\QrCode\Writer\PngWriter;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -28,7 +33,7 @@ class InvoiceController extends Controller
             return DataTables::of($invoices)
                 ->addIndexColumn()
                 ->addColumn('code', function ($row) {
-                    return in_array($row->status, ['completed', 'picked_up'])
+                    return in_array($row->status, ['picked_up'])
                         ? $row->invoice_code
                         : $row->service_code;
                 })
@@ -256,7 +261,7 @@ class InvoiceController extends Controller
             if ($target === 'picked_up') {
                 $invoice->invoice_code = $this->generateInvoiceCode();
                 $invoice->picked_up_date = now();
-                $invoice->warranty_days = 7;
+                $invoice->warranty_days = 30;
                 $invoice->remaining_warranty_claim = 3;
             }
 
@@ -285,5 +290,85 @@ class InvoiceController extends Controller
         $number = $last ? ((int) substr($last->invoice_code, -3)) + 1 : 1;
 
         return $prefix . str_pad($number, 3, '0', STR_PAD_LEFT);
+    }
+
+    // public function printReceipt(Invoice $invoice)
+    // {
+    //     $invoice->load('deviceType');
+
+    //     $pdf = Pdf::loadView('transactions.invoices.pdf.receipt', compact('invoice'))
+    //         ->setPaper([0, 0, 226.77, 600], 'portrait'); // ukuran mirip struk 80mm, tinggi menyesuaikan konten
+
+    //     return $pdf->stream('bukti-penerimaan-' . $invoice->service_code . '.pdf');
+    // }
+
+    // public function printInvoice(Invoice $invoice)
+    // {
+    //     if ($invoice->status !== 'picked_up') {
+    //         abort(403, 'Invoice can only be printed after the item is picked up.');
+    //     }
+
+    //     $invoice->load(['deviceType', 'items.service']);
+
+    //     $pdf = Pdf::loadView('transactions.invoices.pdf.invoice', compact('invoice'))
+    //         ->setPaper([0, 0, 226.77, 700], 'portrait');
+
+    //     return $pdf->stream('invoice-' . $invoice->invoice_code . '.pdf');
+    // }
+
+    public function printReceipt(Invoice $invoice)
+    {
+        $invoice->load('deviceType');
+
+        $pdf = Pdf::loadView('transactions.invoices.pdf.receipt', [
+            'invoice' => $invoice,
+            'companyLogo' => $this->getCompanyLogo(),
+        ])->setPaper('a4', 'portrait');
+
+        return $pdf->stream('bukti-penerimaan-' . $invoice->service_code . '.pdf');
+    }
+
+    public function printInvoice(Invoice $invoice)
+    {
+        if ($invoice->status !== 'picked_up') {
+            abort(403, 'Invoice can only be printed after the item is picked up.');
+        }
+
+        $invoice->load(['deviceType', 'items.service']);
+
+        $pdf = Pdf::loadView('transactions.invoices.pdf.invoice', [
+            'invoice' => $invoice,
+            'companyLogo' => $this->getCompanyLogo(),
+            'qrCode' => $this->generateQrCode($invoice->invoice_code),
+        ])->setPaper('a4', 'portrait');
+
+        return $pdf->stream('invoice-' . $invoice->invoice_code . '.pdf');
+    }
+
+    private function getCompanyLogo(): ?string
+    {
+        $path = public_path('assets/src/img/icons/icon-48x48.png');
+
+        if (!file_exists($path)) {
+            return null;
+        }
+
+        return 'data:image/png;base64,' . base64_encode(file_get_contents($path));
+    }
+
+    private function generateQrCode(string $content): string
+    {
+        $builder = new Builder(
+            writer: new PngWriter(),
+            data: $content,
+            encoding: new Encoding('UTF-8'),
+            errorCorrectionLevel: ErrorCorrectionLevel::Medium,
+            size: 150,
+            margin: 4,
+        );
+
+        $result = $builder->build();
+
+        return 'data:image/png;base64,' . base64_encode($result->getString());
     }
 }

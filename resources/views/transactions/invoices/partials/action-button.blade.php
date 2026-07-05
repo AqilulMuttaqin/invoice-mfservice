@@ -1,9 +1,9 @@
 <div class="d-flex justify-content-center gap-1">
-    <button type="button" class="btn btn-sm btn-info btn-view-detail" data-id="{{ $invoice->id }}" title="View Detail">
-        <i class="fa fa-eye"></i>
+    <button type="button" class="btn btn-sm btn-outline-info btn-view-detail" data-id="{{ $invoice->id }}" title="View Detail">
+        Detail
     </button>
 
-    @if ($invoice->status !== 'cancelled')
+    {{-- @if ($invoice->status !== 'cancelled')
         <a href="{{ route('invoices.print-receipt', $invoice->id) }}" target="_blank" class="btn btn-sm btn-secondary"
             title="Print Receipt">
             <i class="fa fa-file-alt"></i>
@@ -20,5 +20,5 @@
                 <i class="fa fa-file-invoice"></i>
             </button>
         @endif
-    @endif
+    @endif --}}
 </div>
