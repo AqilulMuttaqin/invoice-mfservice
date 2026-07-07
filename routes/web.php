@@ -33,6 +33,7 @@ Route::match(['get', 'head'], '/', function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard/monthly-revenue', [DashboardController::class, 'monthlyRevenueData'])->name('dashboard.monthly-revenue');
 
     Route::controller(DeviceTypeController::class)->prefix('device-types')->name('device-types.')->group(function () {
         Route::get('/', 'index')->name('index');

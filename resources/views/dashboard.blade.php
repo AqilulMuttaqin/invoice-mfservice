@@ -68,7 +68,14 @@
         <div class="col-md-6">
             <div class="card h-100">
                 <div class="card-body">
-                    <p class="fw-medium mb-3">Revenue — last 6 months</p>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <p class="fw-medium mb-0">Revenue — last 6 months</p>
+                        <select class="form-select form-select-sm" id="monthlyRevenueFilter" style="width: 160px;">
+                            @foreach ($monthOptions as $option)
+                                <option value="{{ $option['value'] }}">{{ $option['label'] }}</option>
+                            @endforeach
+                        </select>
+                    </div>
                     <div style="position: relative; height: 220px;">
                         <canvas id="monthlyRevenueChart"></canvas>
                     </div>
@@ -111,7 +118,8 @@
                                         <td>@include('transactions.invoices.partials.status-badge', [
                                             'status' => $invoice->status,
                                         ])</td>
-                                        <td class="text-end">Rp {{ number_format($invoice->grand_total, 0, ',', '.') }}</td>
+                                        <td class="text-end">Rp {{ number_format($invoice->grand_total, 0, ',', '.') }}
+                                        </td>
                                     </tr>
                                 @empty
                                     <tr>
@@ -169,7 +177,7 @@
                 var monthlyLabels = @json($monthlyRevenue['labels']);
                 var monthlyValues = @json($monthlyRevenue['values']);
 
-                new Chart(document.getElementById('monthlyRevenueChart'), {
+                var monthlyChart = new Chart(document.getElementById('monthlyRevenueChart'), {
                     type: 'bar',
                     data: {
                         labels: monthlyLabels,
@@ -198,6 +206,30 @@
                             }
                         }
                     }
+                });
+
+                $('#monthlyRevenueFilter').on('change', function() {
+                    var endMonth = $(this).val();
+
+                    $.ajax({
+                        url: "{{ route('dashboard.monthly-revenue') }}",
+                        type: 'GET',
+                        data: {
+                            end_month: endMonth
+                        },
+                        success: function(response) {
+                            monthlyChart.data.labels = response.labels;
+                            monthlyChart.data.datasets[0].data = response.values;
+                            monthlyChart.update();
+                        },
+                        error: function() {
+                            Swal.fire({
+                                title: "Error",
+                                text: "Failed to load revenue data for the selected month.",
+                                icon: "error"
+                            });
+                        }
+                    });
                 });
 
                 var serviceLabels = @json($popularServices->pluck('label'));

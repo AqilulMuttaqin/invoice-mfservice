@@ -23,8 +23,7 @@ class InvoiceController extends Controller
         if (request()->ajax()) {
             $invoices = Invoice::query()
                 ->join('device_types', 'invoices.device_type_id', '=', 'device_types.id')
-                ->select('invoices.*', 'device_types.name as device_type_name')
-                ->orderByDesc('invoices.created_at');
+                ->select('invoices.*', 'device_types.name as device_type_name');
 
             if ($status = request('status')) {
                 $invoices->where('invoices.status', $status);
@@ -42,6 +41,9 @@ class InvoiceController extends Controller
                 })
                 ->addColumn('received_date', function ($row) {
                     return $row->received_date?->translatedFormat('d M Y') ?? '-';
+                })
+                ->orderColumn('received_date', function ($query, $order) {
+                    $query->orderBy('invoices.received_date', $order);
                 })
                 ->addColumn('status_badge', function ($row) {
                     return view('transactions.invoices.partials.status-badge', ['status' => $row->status])->render();

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
+use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
 class DashboardController extends Controller
@@ -15,10 +16,22 @@ class DashboardController extends Controller
             'metrics' => $this->getMetrics(),
             'overdueCount' => $this->getOverdueCount(),
             'weeklyRevenue' => $this->getWeeklyRevenue(),
-            'monthlyRevenue' => $this->getMonthlyRevenue(),
+            'monthlyRevenue' => $this->getMonthlyRevenue(now()),
             'popularServices' => $this->getPopularServices(),
             'recentInvoices' => $this->getRecentInvoices(),
+            'monthOptions' => $this->getMonthOptions(),
         ]);
+    }
+
+    public function monthlyRevenueData(Request $request)
+    {
+        $request->validate([
+            'end_month' => 'required|date_format:Y-m',
+        ]);
+
+        $endMonth = Carbon::createFromFormat('Y-m', $request->end_month)->startOfMonth();
+
+        return response()->json($this->getMonthlyRevenue($endMonth));
     }
 
     private function getMetrics(): array
@@ -60,18 +73,23 @@ class DashboardController extends Controller
         ];
     }
 
-    private function getMonthlyRevenue(): array
+    private function getMonthlyRevenue(Carbon $endMonth): array
     {
-        $months = collect(range(5, 0))->map(fn($i) => now()->subMonths($i)->startOfMonth());
+        $endMonth = $endMonth->copy()->startOfMonth(); // jaga-jaga, normalkan lagi di sini juga
+
+        $rangeStart = $endMonth->copy()->subMonths(5)->startOfMonth();
+        $rangeEnd = $endMonth->copy()->endOfMonth(); // aman, karena base-nya sudah start of month
+
+        $months = collect(range(5, 0))->map(fn($i) => $endMonth->copy()->subMonths($i)->startOfMonth());
 
         $raw = Invoice::where('status', 'picked_up')
-            ->where('picked_up_date', '>=', now()->subMonths(5)->startOfMonth())
+            ->whereBetween('picked_up_date', [$rangeStart, $rangeEnd])
             ->selectRaw('DATE_FORMAT(picked_up_date, "%Y-%m") as month, SUM(grand_total) as total')
             ->groupBy('month')
             ->pluck('total', 'month');
 
         return [
-            'labels' => $months->map(fn($m) => $m->translatedFormat('M')),
+            'labels' => $months->map(fn($m) => $m->translatedFormat('M Y')),
             'values' => $months->map(fn($m) => (float) ($raw[$m->format('Y-m')] ?? 0)),
         ];
     }
@@ -99,8 +117,20 @@ class DashboardController extends Controller
         return Invoice::query()
             ->join('device_types', 'invoices.device_type_id', '=', 'device_types.id')
             ->select('invoices.*')
-            ->orderByDesc('invoices.created_at')
+            ->orderByDesc('invoices.received_date')
             ->limit(5)
             ->get();
+    }
+
+    private function getMonthOptions(): array
+    {
+        return collect(range(0, 23))->map(function ($i) {
+            $month = now()->subMonths($i);
+
+            return [
+                'value' => $month->format('Y-m'),
+                'label' => $month->translatedFormat('F Y'),
+            ];
+        })->toArray();
     }
 }

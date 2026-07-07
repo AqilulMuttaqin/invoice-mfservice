@@ -47,13 +47,13 @@
                     {
                         data: 'status_badge',
                         name: 'status',
-                        orderable: true,
+                        orderable: false,
                         searchable: false
                     },
                     {
                         data: 'grand_total',
                         name: 'grand_total',
-                        orderable: true,
+                        orderable: false,
                         searchable: false
                     },
                     {
